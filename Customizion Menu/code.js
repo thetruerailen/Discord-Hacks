@@ -250,6 +250,7 @@ function openPopup() {
     getBadges();
     getPomelo();
     console.log("Gave all of the badges!")
+    console.log("Make sure that your in your profile for this hack!")
   }
 }
 
