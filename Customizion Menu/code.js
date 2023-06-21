@@ -180,6 +180,9 @@ function openPopup() {
   var button3 = popupWindow.document.createElement("button");
   button3.textContent = "Badges";
 
+  var button4 = popupWindow.document.createElement("button");
+  button4.textContent = "Mute All SERVERS";
+
 
   var input = document.createElement("input");
   input.type = "text";
@@ -229,6 +232,7 @@ function openPopup() {
   menuContainer.appendChild(button1);
   menuContainer.appendChild(button2);
   menuContainer.appendChild(button3);
+  menuContainer.appendChild(button4);
 
   // Append the menuContainer to the popup window's document body
   popupWindow.document.body.appendChild(menuContainer);
@@ -236,6 +240,7 @@ function openPopup() {
   button1.addEventListener("click", executeCode1);
   button2.addEventListener("click", executeCode2);
   button3.addEventListener("click", executeCode3);
+  button4.addEventListener("click", executeCode4);
 
   function executeCode1() {
     console.log("Better darkmode theme! (on)");
@@ -251,6 +256,47 @@ function openPopup() {
     getPomelo();
     console.log("Gave all of the badges!")
     console.log("Make sure that your in your profile for this hack!")
+  }
+  function executeCode4() {
+    (async () => {
+    const muteSetting = {
+        muted: true, // mutes the server
+
+        message_notifications: 1, // sets message notifs (0 = "All Messages", 1 = "Only @mentions", 2 = "Nothing")
+
+        suppress_everyone: true, // mutes @everyone and @here
+        suppress_roles: true, // mutes all role @mentions
+        notify_highlights: 1, // mutes "Highlights" notifs
+        mute_scheduled_events: true, // mutes "New Events" notifs
+
+        mobile_push: true, // turns on mobile push notifs
+    }
+
+    // adds findByProps snippet
+    let _mods = webpackChunkdiscord_app.push([[Symbol()], {}, ({ c }) => Object.values(c)])
+    webpackChunkdiscord_app.pop()
+    const findByProps = (...props) => {
+        for (let m of _mods) {
+            try {
+                if (!m.exports || m.exports === window) continue
+                if (props.every((x) => m.exports?.[x])) return m.exports
+                for (let ex in m.exports) {
+                    if (props.every((x) => m.exports?.[ex]?.[x])) return m.exports[ex]
+                }
+            } catch {}
+        }
+    }
+
+    // this part mutes all servers
+    const updateNotif = findByProps("updateGuildNotificationSettings").updateGuildNotificationSettings
+    for (const guildId of Object.keys(findByProps("getGuilds").getGuilds())) {
+        console.log("muting", guildId)
+        updateNotif(guildId, muteSetting)
+
+        // rate limit protection
+        await new Promise((r) => setTimeout(r, 1000))
+    }
+})()
   }
 }
 
